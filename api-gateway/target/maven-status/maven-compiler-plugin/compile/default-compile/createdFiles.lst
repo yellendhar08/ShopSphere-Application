@@ -1,0 +1,3 @@
+com\shopsphere\gateway\ApiGatewayApplication.class
+com\shopsphere\gateway\filter\JwtAuthFilter.class
+com\shopsphere\gateway\config\SecurityConfig.class
