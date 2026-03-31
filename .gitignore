@@ -1,19 +1,13 @@
-# Maven
 target/
 
-# Logs
 *.log
 
-# Java compiled
 *.class
 
-# IDE
 .idea/
 .vscode/
 
-# Env
 .env
 
-# Build files
 *.jar
 *.war
