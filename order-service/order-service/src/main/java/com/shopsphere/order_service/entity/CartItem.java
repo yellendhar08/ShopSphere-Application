@@ -22,6 +22,7 @@ public class CartItem {
     private String productName;
     private Integer quantity;
     private Double price;
+    private String productImageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id")

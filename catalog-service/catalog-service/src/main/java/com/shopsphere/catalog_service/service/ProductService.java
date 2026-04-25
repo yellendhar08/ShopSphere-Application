@@ -56,6 +56,7 @@ public class ProductService {
                 .price(request.getPrice())
                 .stock(request.getStock())
                 .isFeatured(request.getIsFeatured())
+                .imageUrl(request.getImageUrl())
                 .isDeleted(false)
                 .category(category)
                 .build();
@@ -83,6 +84,7 @@ public class ProductService {
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
         product.setIsFeatured(request.getIsFeatured());
+        product.setImageUrl(request.getImageUrl());
         product.setCategory(category);
         return toResponse(productRepository.save(product));
     }
@@ -99,6 +101,7 @@ public class ProductService {
                 .id(p.getId())
                 .name(p.getName())
                 .description(p.getDescription())
+                .imageUrl(p.getImageUrl())
                 .price(p.getPrice())
                 .stock(p.getStock())
                 .isFeatured(p.getIsFeatured())

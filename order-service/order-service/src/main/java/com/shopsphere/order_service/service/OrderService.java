@@ -48,6 +48,7 @@ public class OrderService {
                         .productName(i.getProductName())
                         .quantity(i.getQuantity())
                         .price(i.getPrice())
+                        .productImageUrl(i.getProductImageUrl())
                         .order(order)
                         .build()
         ).collect(Collectors.toList());
@@ -123,6 +124,7 @@ public class OrderService {
                         .productName(i.getProductName())
                         .quantity(i.getQuantity())
                         .price(i.getPrice())
+                        .imageUrl(i.getProductImageUrl())
                         .subtotal(i.getPrice() * i.getQuantity())
                         .build()
         ).collect(Collectors.toList());

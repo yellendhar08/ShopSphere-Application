@@ -49,6 +49,7 @@ public class CartService {
                                 .productName(product.getName())
                                 .quantity(request.getQuantity())
                                 .price(product.getPrice())
+                                .productImageUrl(product.getImageUrl())
                                 .cart(cart).build())
                 );
 
@@ -97,6 +98,7 @@ public class CartService {
                         .productName(i.getProductName())
                         .quantity(i.getQuantity())
                         .price(i.getPrice())
+                        .imageUrl(i.getProductImageUrl())
                         .subtotal(i.getPrice() * i.getQuantity())
                         .build()
         ).collect(Collectors.toList());

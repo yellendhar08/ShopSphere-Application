@@ -13,6 +13,7 @@ public class OrderItemResponse {
     private Long id;
     private Long productId;
     private String productName;
+    private String imageUrl;
     private Integer quantity;
     private Double price;
     private Double subtotal;

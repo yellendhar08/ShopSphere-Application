@@ -13,6 +13,8 @@ public class ProductRequest{
 
     private String description;
 
+    private String imageUrl;
+
     @NotNull(message = "Price is required")
     @Positive(message = "Price must be positive")
     private Double price;
