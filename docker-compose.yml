@@ -63,10 +63,12 @@ services:
     build:
       context: ./config-server/config-server
     container_name: config-server
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     ports:
       - "8888:8888"
     environment:
-
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/yellendhar08/shopsphere-config-docker
       SPRING_CLOUD_CONFIG_SERVER_GIT_CLONE_ON_START: "true"

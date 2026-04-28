@@ -23,6 +23,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     private static final List<String> PUBLIC_PATHS = List.of(
             "/gateway/auth/login",
             "/gateway/auth/signup",
+            "/gateway/catalog/categories",
             "/swagger-ui",
             "/webjars",
             "/v3/api-docs",
@@ -34,9 +35,19 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
+        if (exchange.getRequest().getMethod().name().equals("OPTIONS")) {
+            return chain.filter(exchange);
+        }
+
         String path = exchange.getRequest().getURI().getPath();
 
         if (PUBLIC_PATHS.stream().anyMatch(path::startsWith)) {
+            return chain.filter(exchange);
+        }
+
+        if (path.startsWith("/gateway/catalog/products") &&
+                exchange.getRequest().getMethod().name().equals("GET")) {
             return chain.filter(exchange);
         }
 
@@ -58,6 +69,8 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
             String userId = claims.get("id", Long.class).toString();
             String role = claims.get("role", String.class);
+
+//            System.out.println("GATEWAY FORWARDING - userId: " + userId + " role: " + role);
 
             ServerWebExchange modifiedExchange = exchange.mutate()
                     .request(r -> r.header("X-User-Id", userId).header("X-User-Role", role))
