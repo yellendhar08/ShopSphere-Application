@@ -31,6 +31,7 @@ public class Product{
     @Column(nullable = false)
     private Integer stock;
 
+    @Column(name = "image_url", length = 2048)
     private String imageUrl;
 
     @Column(nullable = false)

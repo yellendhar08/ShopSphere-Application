@@ -22,16 +22,24 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
 
-    public Page<ProductResponse> getAllProducts(String search, Long categoryId, int page, int size, String sortBy){
-        Pageable pageable =PageRequest.of(page, size, Sort.by(sortBy).ascending());
+    public Page<ProductResponse> getAllProducts(String search, Long categoryId, int page, int size, String sortBy) {
+
+        Sort sort = switch (sortBy) {
+            case "priceAsc" -> Sort.by("price").ascending();
+            case "priceDesc" -> Sort.by("price").descending();
+            case "newest" -> Sort.by("createdAt").descending();
+            default -> Sort.by("name").ascending();
+        };
+
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<Product> products;
-        if(search!=null && !search.isEmpty()){
+        if (search != null && !search.isEmpty()) {
             products = productRepository.findByIsDeletedFalseAndNameContainingIgnoreCase(search, pageable);
-        }else if(categoryId!=null){
-            products=productRepository.findByIsDeletedFalseAndCategoryId(categoryId, pageable);
-        }else {
-            products=productRepository.findByIsDeletedFalse(pageable);
+        } else if (categoryId != null) {
+            products = productRepository.findByIsDeletedFalseAndCategoryId(categoryId, pageable);
+        } else {
+            products = productRepository.findByIsDeletedFalse(pageable);
         }
         return products.map(this::toResponse);
     }
