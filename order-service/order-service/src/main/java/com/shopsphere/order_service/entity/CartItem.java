@@ -22,6 +22,8 @@ public class CartItem {
     private String productName;
     private Integer quantity;
     private Double price;
+
+    @Column(name = "product_image_url", length = 2048)
     private String productImageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
