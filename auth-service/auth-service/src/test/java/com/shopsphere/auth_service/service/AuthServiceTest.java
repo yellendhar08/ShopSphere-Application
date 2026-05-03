@@ -1,4 +1,5 @@
 package com.shopsphere.auth_service.service;
+
 import com.shopsphere.auth_service.dto.AuthResponse;
 import com.shopsphere.auth_service.dto.LoginRequest;
 import com.shopsphere.auth_service.dto.SignUpRequest;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.Optional;
 
@@ -33,38 +35,61 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder encoder;
 
+    // 🔥 ADD THIS
+    @Mock
+    private RabbitTemplate rabbitTemplate;
+
     @InjectMocks
     private AuthService authService;
 
     @Test
     void signUpUser_success() {
+
         SignUpRequest request = new SignUpRequest("Chintu", "chintu@mail.com", "password123");
 
         when(repository.existsByEmail(request.getEmail())).thenReturn(false);
         when(encoder.encode(request.getPassword())).thenReturn("encodedPassword");
 
-        // Optional but good practice
         when(repository.save(any(User.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
+        // 🔥 MOCK RABBIT CALL (VERY IMPORTANT)
+        doNothing().when(rabbitTemplate)
+                .convertAndSend(
+                        anyString(),
+                        anyString(),
+                        (Object) any()
+                );
+
         AuthResponse response = authService.signUpUser(request);
 
-        // ✅ Since service returns null
         assertNull(response);
 
         verify(repository, times(1)).save(any(User.class));
+
+        // optional: verify event sent
+        verify(rabbitTemplate, times(1))
+                .convertAndSend(
+                        anyString(),
+                        anyString(),
+                        (Object) any()
+                );
     }
 
     @Test
     void signUpUser_emailAlreadyExists_shouldThrowException() {
         SignUpRequest request = new SignUpRequest("Chintu", "chintu@mail.com", "password123");
+
         when(repository.existsByEmail(request.getEmail())).thenReturn(true);
+
         assertThrows(DuplicateEmailException.class, () -> authService.signUpUser(request));
+
         verify(repository, never()).save(any(User.class));
     }
 
     @Test
     void login_success() {
+
         LoginRequest request = new LoginRequest("chintu@mail.com", "password123");
 
         User user = User.builder()
@@ -81,13 +106,11 @@ class AuthServiceTest {
 
         assertNotNull(response);
         assertEquals("mocked-jwt-token", response.getToken());
-//        assertEquals("chintu@mail.com", response.getEmail());
-//        assertEquals("CUSTOMER", response.getRole());
-//        assertEquals("Login Successful", response.getMessage());
     }
 
     @Test
     void login_userNotFound_shouldThrowException() {
+
         LoginRequest request = new LoginRequest("chintu@mail.com", "password123");
 
         when(repository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
@@ -106,9 +129,11 @@ class AuthServiceTest {
                 .password("encodedPassword")
                 .role(Role.CUSTOMER)
                 .build();
+
         when(repository.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
         when(encoder.matches(request.getPassword(), user.getPassword())).thenReturn(false);
 
-        assertThrows(InvalidCredentialsException.class, () -> authService.login(request));
+        assertThrows(InvalidCredentialsException.class,
+                () -> authService.login(request));
     }
 }
