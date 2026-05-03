@@ -12,6 +12,9 @@ import com.shopsphere.auth_service.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +23,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final UserRepository repository;
     private final PasswordEncoder encoder;
+    private final RabbitTemplate rabbitTemplate;
 
 
     public AuthResponse signUpUser(SignUpRequest request){
@@ -35,12 +39,11 @@ public class AuthService {
                 .build();
 
         repository.save(user);
-
-//        return AuthResponse.builder()
-////                .email(user.getEmail())
-////                .role(user.getRole().name())
-//                .message("User registered successfully")
-//                .build();
+        // Publish signup event
+        Map<String, String> signupEvent = new HashMap<>();
+        signupEvent.put("email", user.getEmail());
+        signupEvent.put("name", user.getName());
+        rabbitTemplate.convertAndSend("notification.exchange", "user.signup", signupEvent);
         return null;
     }
 
@@ -55,9 +58,6 @@ public class AuthService {
         String token = jwtUtil.generateToken(user);
         return AuthResponse.builder()
                 .token(token)
-//                .email(user.getEmail())
-//                .role(user.getRole().name())
-//                .message("Login Successful")
                 .build();
     }
 }

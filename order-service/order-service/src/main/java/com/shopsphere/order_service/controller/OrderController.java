@@ -30,8 +30,9 @@ public class OrderController {
     @PostMapping("/place")
     public ResponseEntity<ApiResponse<OrderResponse>> placeOrder(
             @RequestHeader("X-User-Id") Long userId,
+            @RequestHeader(value = "X-User-Email", defaultValue = "") String userEmail,
             @RequestBody PlaceOrderRequest request) {
-        return ResponseEntity.ok(ApiResponse.success("Order placed successfully", orderService.placeOrder(userId, request.getOrderId())));
+        return ResponseEntity.ok(ApiResponse.success("Order placed successfully", orderService.placeOrder(userId, request.getOrderId(), userEmail)));
     }
 
     @GetMapping("/{id}")

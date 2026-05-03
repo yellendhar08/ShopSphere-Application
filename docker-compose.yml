@@ -66,6 +66,9 @@ services:
     dns:
       - 8.8.8.8
       - 8.8.4.4
+    extra_hosts:
+      - "github.com:140.82.121.4"
+      - "objects.githubusercontent.com:185.199.108.133"
     ports:
       - "8888:8888"
     environment:
@@ -176,6 +179,26 @@ services:
       eureka-server:
         condition: service_healthy
       config-server:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: ./notification-service
+    container_name: notification-service
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_RABBITMQ_HOST: rabbitmq
+    networks:
+      - shopsphere-network
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
 volumes:

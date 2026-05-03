@@ -118,7 +118,7 @@ class OrderServiceTest {
 
         when(orderRepository.findByIdAndUserId(1L, userId)).thenReturn(Optional.of(order));
 
-        OrderResponse response = orderService.placeOrder(userId, 1L);
+        OrderResponse response = orderService.placeOrder(userId, 1L,  "test@test.com");
         assertNotNull(response);
         verify(orderEventPublisher, times(1))
                 .publishOrderConfirmation(any());
@@ -135,7 +135,7 @@ class OrderServiceTest {
 
         when(orderRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(order));
 
-        assertThrows(InvalidOrderStatusException.class, () -> orderService.placeOrder(1L, 1L));
+        assertThrows(InvalidOrderStatusException.class, () -> orderService.placeOrder(1L, 1L, "test@test.com"));
     }
 
     @Test

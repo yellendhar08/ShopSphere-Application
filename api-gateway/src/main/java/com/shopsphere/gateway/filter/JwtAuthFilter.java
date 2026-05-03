@@ -70,14 +70,16 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
                     .parseSignedClaims(token)
                     .getPayload();
 
-
             String userId = claims.get("id", Long.class).toString();
             String role = claims.get("role", String.class);
 
-
+            String email = claims.getSubject();
             ServerWebExchange modifiedExchange = exchange.mutate()
-                    .request(r -> r.header("X-User-Id", userId).header("X-User-Role", role))
+                    .request(r -> r.header("X-User-Id", userId)
+                            .header("X-User-Role", role)
+                            .header("X-User-Email", email))
                     .build();
+
             return chain.filter(modifiedExchange);
         } catch (JwtException | IllegalArgumentException e) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
