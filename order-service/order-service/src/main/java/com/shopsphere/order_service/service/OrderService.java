@@ -91,8 +91,8 @@ public class OrderService {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
-        if (order.getStatus() != OrderStatus.PAID)
-            throw new InvalidOrderStatusException("Order must be paid before placing");
+        if (order.getStatus() != OrderStatus.PAID && order.getStatus() != OrderStatus.PLACED)
+            throw new InvalidOrderStatusException("Order must be paid or placed before confirming");
 
         List<OrderItemEvent> itemEvents = order.getItems().stream()
                         .map(item-> new OrderItemEvent(

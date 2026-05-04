@@ -53,7 +53,6 @@ class AuthServiceTest {
         when(repository.save(any(User.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        // 🔥 MOCK RABBIT CALL (VERY IMPORTANT)
         doNothing().when(rabbitTemplate)
                 .convertAndSend(
                         anyString(),
@@ -67,7 +66,6 @@ class AuthServiceTest {
 
         verify(repository, times(1)).save(any(User.class));
 
-        // optional: verify event sent
         verify(rabbitTemplate, times(1))
                 .convertAndSend(
                         anyString(),

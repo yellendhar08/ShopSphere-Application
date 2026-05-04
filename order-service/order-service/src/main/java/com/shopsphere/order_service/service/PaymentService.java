@@ -28,16 +28,20 @@ public class PaymentService {
             throw new InvalidOrderStatusException("Order is not in checkout state");
         }
 
-        if (request.getPaymentMode() != PaymentMode.COD) {
-            throw new PaymentFailedException(
-                    request.getPaymentMode() + " is not supported. Only COD is available."
-            );
+        if (request.getPaymentMode() == PaymentMode.COD) {
+            order.setPaymentMode(PaymentMode.COD);
+            order.setStatus(OrderStatus.PLACED);
+            orderRepository.save(order);
+            return orderService.getOrderById(userId, order.getId());
         }
 
-        order.setPaymentMode(request.getPaymentMode());
-        order.setStatus(OrderStatus.PAID);
+        if (request.getPaymentMode() == PaymentMode.PREPAID) {
+            order.setPaymentMode(PaymentMode.PREPAID);
+            order.setStatus(OrderStatus.PAID);
+            orderRepository.save(order);
+            return orderService.getOrderById(userId, order.getId());
+        }
 
-        orderRepository.save(order);
-        return orderService.getOrderById(userId, order.getId());
+        throw new PaymentFailedException("Unsupported payment mode. Use COD or PREPAID.");
     }
 }
